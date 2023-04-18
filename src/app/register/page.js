@@ -1,40 +1,26 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
-import { auth } from "../../../firebase/firebase";
 import {
-  createUserWithEmailAndPassword,
-  updateProfile,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
-
-const provider = new GoogleAuthProvider();
+  signUpUserWithEmailAndPassword,
+  signInWithGoogle,
+} from "../../../firebase/auth";
 
 const RegisterForm = () => {
+  const router = useRouter();
   const [username, setUsername] = useState(null);
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
 
   const singupHandler = async () => {
-    if (!username || !email || !password) {
-      return;
-    }
-    try {
-      const user = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(auth.currentUser, {
-        displayName: username,
-      });
-      console.log(user);
-    } catch (error) {
-      console.log("RegisterForm Error", error);
-    }
+    await signUpUserWithEmailAndPassword(email, password, username);
+    router.push("/");
   };
-
-  const signInWithGoogle = async () => {
-    const user = await signInWithPopup(auth, provider);
-    console.log(user);
+  const handleGoogleSignIn = async () => {
+    await signInWithGoogle();
+    router.push("/");
   };
 
   return (
@@ -50,7 +36,7 @@ const RegisterForm = () => {
           </p>
 
           <div
-            onClick={signInWithGoogle}
+            onClick={handleGoogleSignIn}
             className="bg-black/[0.05] text-white w-full py-4 mt-10 rounded-full transition-transform hover:bg-black/[0.8] active:scale-90 flex justify-center items-center gap-4 cursor-pointer group"
           >
             <FcGoogle size={22} />

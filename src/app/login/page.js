@@ -1,38 +1,26 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
-import { auth } from "../../../firebase/firebase";
 import {
-  signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
-const provider = new GoogleAuthProvider();
+  signInUserWithEmailAndPassword,
+  signInWithGoogle,
+} from "../../../firebase/auth";
 
 const LoginForm = () => {
+  const router = useRouter();
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
 
   const loginHandler = async () => {
-    if (!email || !password) {
-      return;
-    }
-    try {
-      const user = await signInWithEmailAndPassword(auth, email, password);
-      console.log(user);
-    } catch (error) {
-      console.log("LoginForm Error", error);
-    }
+    await signInUserWithEmailAndPassword(email, password);
+    router.push("/");
   };
 
-  const signInWithGoogle = async () => {
-    try {
-      const user = await signInWithPopup(auth, provider);
-      console.log(user);
-    } catch (error) {
-      console.log("GoogleSignIn Error", error);
-    }
+  const handleGoogleLogIn = async () => {
+    await signInWithGoogle();
+    router.push("/");
   };
 
   return (
@@ -48,7 +36,7 @@ const LoginForm = () => {
           </p>
 
           <div
-            onClick={signInWithGoogle}
+            onClick={handleGoogleLogIn}
             className="bg-black/[0.05] text-white w-full py-4 mt-10 rounded-full transition-transform hover:bg-black/[0.8] active:scale-90 flex justify-center items-center gap-4 cursor-pointer group"
           >
             <FcGoogle size={22} />
