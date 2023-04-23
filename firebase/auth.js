@@ -18,7 +18,7 @@ export const getCurrentUser = async () => {
     return new Promise((resolve, reject) => {
       auth.onAuthStateChanged((user) => {
         if (user) {
-          resolve(user.uid);
+          resolve(user);
         } else {
           resolve(null);
         }
@@ -62,7 +62,7 @@ export const signInUserWithEmailAndPassword = async (email, password) => {
       email,
       password
     );
-    console.log(userCredential.user);
+    // console.log(userCredential.user);
   } catch (error) {
     console.log(error);
   }
@@ -70,7 +70,7 @@ export const signInUserWithEmailAndPassword = async (email, password) => {
 
 export const signInWithGoogle = async () => {
   const user = await signInWithPopup(auth, provider);
-  console.log(user);
+  // console.log(user);
 };
 
 export const signOutUser = async () => {
