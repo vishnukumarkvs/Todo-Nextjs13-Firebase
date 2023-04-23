@@ -35,30 +35,29 @@ const TodoHome = () => {
 
   const getTodos = async () => {
     console.log("entered");
-    if (user) {
-      const q = query(collection(db, "todos"), where("owner", "==", user.uid));
-      let data = [];
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        console.log(doc.id, " => ", doc.data());
-        data.push({ ...doc.data(), id: doc.id });
-      });
-      setTodos(data);
-    }
+    const q = query(collection(db, "todos"), where("owner", "==", user.uid));
+    let data = [];
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      console.log(doc.id, " => ", doc.data());
+      data.push({ ...doc.data(), id: doc.id });
+    });
+    setTodos(data);
+    setLoading(false);
   };
 
   const getTheUser = async () => {
     const user = await getCurrentUser();
     setUser(user);
     console.log("user", user);
-    await getTodos();
-    setLoading(false);
-    console.log("todos", todos);
   };
 
   useEffect(() => {
     getTheUser();
-  }, []);
+    if (user) {
+      getTodos();
+    }
+  }, [user]);
 
   if (loading) {
     return (
@@ -151,7 +150,7 @@ const TodoHome = () => {
           </div>
           <div className="flex items-center gap-2 mt-10">
             <input
-              placeholder={`👋 Hello name, What to do Today?`}
+              placeholder={`👋 What's your tasks today?`}
               type="text"
               className="font-semibold placeholder:text-gray-500 border-[2px] border-black h-[60px] grow shadow-sm rounded-md px-4 focus-visible:outline-yellow-400 text-lg transition-all duration-300"
               autoFocus
