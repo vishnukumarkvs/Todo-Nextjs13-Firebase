@@ -6,6 +6,7 @@ import { GoSignOut } from "react-icons/go";
 import { useRouter } from "next/navigation";
 import { getFirestore } from "firebase/firestore";
 import { app } from "../../firebase/firebase";
+import { auth } from "../../firebase/auth";
 
 import {
   collection,
@@ -22,7 +23,7 @@ const arr = [
   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
 ];
 
-import { getCurrentUser, signOutUser } from "../../firebase/auth";
+import { signOutUser } from "../../firebase/auth";
 
 const db = getFirestore(app);
 
@@ -35,6 +36,9 @@ const TodoHome = () => {
 
   const getTodos = async () => {
     console.log("entered");
+    if (!user) {
+      return; // user is null or undefined, so exit early
+    }
     const q = query(collection(db, "todos"), where("owner", "==", user.uid));
     let data = [];
     const querySnapshot = await getDocs(q);
@@ -46,38 +50,44 @@ const TodoHome = () => {
     setLoading(false);
   };
 
-  const getTheUser = async () => {
-    const user = await getCurrentUser();
-    setUser(user);
-    console.log("user", user);
-  };
-
   useEffect(() => {
-    getTheUser();
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        // User is signed in, so set the user state variable
+        setUser(user);
+        setLoading(false);
+        getTodos();
+      } else {
+        // No user is signed in, so clear the user state variable
+        router.push("/login");
+        setUser(null);
+      }
+    });
+
     if (user) {
       getTodos();
     }
+
+    return () => unsubscribe(); // unsubscribe from the listener when the component unmounts
   }, [user]);
 
   if (loading) {
     return (
-      <div>
-        <p>LOADING...</p>
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-black"></div>
       </div>
     );
-  } else {
-    if (!user) {
-      return (
-        <div>
-          <h5>Please Log In...</h5>
-        </div>
-      );
-    }
   }
 
-  const handleSignOut = () => {
-    signOutUser();
-    router.push("/login");
+  const handleSignOut = async () => {
+    try {
+      setLoading(true);
+      await signOutUser(auth);
+      setUser(null); // clear the user state variable
+      router.push("/login");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const addTodo = async () => {

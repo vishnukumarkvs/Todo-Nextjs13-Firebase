@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import {
+  auth,
   signUpUserWithEmailAndPassword,
   signInWithGoogle,
 } from "../../../firebase/auth";
@@ -13,6 +14,16 @@ const RegisterForm = () => {
   const [username, setUsername] = useState(null);
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        // User is signed in, so set the user state variable
+        router.push("/");
+      }
+    });
+    return () => unsubscribe(); // unsubscribe from the listener when the component unmounts
+  }, []);
 
   const singupHandler = async () => {
     await signUpUserWithEmailAndPassword(email, password, username);
@@ -30,7 +41,12 @@ const RegisterForm = () => {
           <h1 className="text-6xl font-semibold">Sign Up</h1>
           <p className="mt-6 ml-1">
             Already have an account ?{" "}
-            <span className="underline hover:text-blue-400 cursor-pointer">
+            <span
+              onClick={() => {
+                router.push("/login");
+              }}
+              className="underline hover:text-blue-400 cursor-pointer"
+            >
               Login
             </span>
           </p>
