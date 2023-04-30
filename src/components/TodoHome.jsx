@@ -136,7 +136,7 @@ const TodoHome = () => {
 
   return (
     <div>
-      <div className="mt-4 p-5 rounded-lg bg-white/[0.5] text-black active:scale-90 flex items-center justify-center gap-2 font-medium shadow-md fixed top-5 right-5 cursor-pointer transition duration-300 ease-in-out transform hover:scale-110 hover:shadow-md border-2 border-black">
+      <div className="z-10 mt-4 p-5 rounded-lg bg-white/[0.5] text-black active:scale-90 flex items-center justify-center gap-2 font-medium shadow-md fixed top-5 right-5 cursor-pointer transition duration-300 ease-in-out transform hover:scale-110 hover:shadow-md border-2 border-black">
         <span>
           Welcome{" "}
           <span className="text-[#322d85] font-semibold">
